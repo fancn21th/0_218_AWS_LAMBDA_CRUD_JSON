@@ -94,6 +94,10 @@ You can now send an HTTP request directly to the endpoint using a tool like curl
 serverless invoke --function jsonCrud --log --data='{ "image_url": "https://avatars.githubusercontent.com/u/4645715?s=96&v=4", "key": "alex.png"}'
 ```
 
+```bash
+serverless invoke local --function jsonCrud --data='{ "image_url": "https://avatars.githubusercontent.com/u/4645715?s=96&v=4", "key": "alex.png"}'
+```
+
 The expected result should be similar to:
 
 ```bash
