@@ -1,11 +1,27 @@
-service: aws-node # NOTE: update this with your service name
+service: json-crud
 
-frameworkVersion: '3'
+frameworkVersion: "3"
+
+custom:
+  bucket: fake-api-aug
 
 provider:
   name: aws
   runtime: nodejs14.x
+  stage: dev
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:GetObjectAcl
+            - s3:PutObject
+            - s3:PutObjectAcl
+          Resource: "arn:aws:s3:::${self:custom.bucket}/*"
 
 functions:
-  hello:
-    handler: handler.hello
+  jsonCrud:
+    handler: handler.jsonCrud
+    environment:
+      BUCKET: ${self:custom.bucket}

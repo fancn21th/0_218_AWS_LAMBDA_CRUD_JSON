@@ -1,0 +1,11 @@
+{
+  "name": "json-crud",
+  "description": "crud a json file and sync with a bucket.",
+  "version": "1.0.0",
+  "author": "Fan, Yi-Jie (fancn21th.cn)",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.7.9",
+    "node-fetch": "^1.6.3"
+  }
+}
