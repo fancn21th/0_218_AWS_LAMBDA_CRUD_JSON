@@ -13,7 +13,7 @@ sls deploy function --function jsonCrud --verbose
 You can now send an HTTP request directly to the endpoint using a tool like curl
 
 ```bash
-serverless invoke --function jsonCrud --log --data='{ "data": "{}"}'
+serverless invoke --function jsonCrud --data='{ "data": "{}"}'
 ```
 
 ```bash
