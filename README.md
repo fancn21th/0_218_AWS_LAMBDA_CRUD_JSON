@@ -1,5 +1,13 @@
 # AWS lambda crud json object
 
+## ESM Style
+
+## Deploy
+
+```bash
+sls deploy function --function jsonCrud --verbose
+```
+
 ## Test
 
 You can now send an HTTP request directly to the endpoint using a tool like curl
@@ -21,5 +29,3 @@ START RequestId: c658859d-bd11e6-ac1f-c7a7ee5bd7f3 Version: $LATEST
 END RequestId: c658859d-bd11e6-ac1f-c7a7ee5bd7f3
 REPORT RequestId: c658859d-bd11e6-ac1f-c7a7ee5bd7f3	Duration: 436.94 ms	Billed Duration: 500 ms 	Memory Size: 1024 MB	Max Memory Used: 29 MB
 ```
-
-##
