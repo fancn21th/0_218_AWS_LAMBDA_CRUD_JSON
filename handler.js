@@ -7,6 +7,14 @@ export const jsonCrud = async (event) => {
   // read before usage
   await db.read();
 
+  db.data.posts = [
+    {
+      id: new Date().getMilliseconds(),
+    },
+  ];
+
+  await db.write();
+
   return {
     statusCode: 200,
     body: JSON.stringify(
