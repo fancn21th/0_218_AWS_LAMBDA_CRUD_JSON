@@ -15,24 +15,23 @@ export const jsonCrud = async (event) => {
 
   try {
     const _method = event.httpMethod;
-    const _body = parse(event.body);
-    const _query = event.queryStringParameters;
+    const _body = parse(event.body); // body
+    const _query = event.queryStringParameters; // query string
 
-    const _name =
-      _method === "GET"
-        ? _query.name // query string
-        : _body.name; // body
+    const _name = _method === "GET" ? _query.name : _body.name;
 
     if (!_name) throw new Error("no db name is provided");
 
     const _data = _body.data || {};
-    const result = await handlerMap[_method](_name, _data);
+    const _value = await handlerMap[_method](_name, _data);
 
     return {
       statusCode: 200,
       body: stringify({
         ok: true,
-        result,
+        data: {
+          _name: _value,
+        },
       }),
     };
   } catch (error) {
