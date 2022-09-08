@@ -30,7 +30,7 @@ export const jsonCrud = async (event) => {
       body: stringify({
         ok: true,
         data: {
-          _name: _value,
+          [_name]: _value,
         },
       }),
     };
