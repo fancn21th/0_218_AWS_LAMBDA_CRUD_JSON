@@ -7,7 +7,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
-const stringify = (obj) => JSON.stringify(obj, null, 2);
+import { stringify } from "./utils";
 
 // refer to
 //  https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-creating-buckets.html
@@ -66,7 +66,7 @@ export default class s3Adaptor {
             ContentType: this.contentType,
           })
         );
-        resolve(result); // For unit tests.
+        resolve(result);
       } catch (error) {
         reject(error);
       }
