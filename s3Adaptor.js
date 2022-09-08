@@ -7,7 +7,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
-import { stringify } from "./utils";
+import { stringify, parse } from "./utils.js";
 
 // refer to
 //  https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/s3-example-creating-buckets.html
@@ -27,7 +27,7 @@ export default class s3Adaptor {
     {
       bucketName = process.env.BUCKET,
       serialize = stringify,
-      deserialize = JSON.parse,
+      deserialize = parse,
     } = {}
   ) {
     this.source = source;

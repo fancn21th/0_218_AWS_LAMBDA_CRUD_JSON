@@ -6,14 +6,16 @@ const db = new Low(new s3Adaptor());
 // read before usage
 await db.read();
 
+const data = db.data;
+
 const _post = async (name, payload) => {
-  db[name] = payload;
+  data[name] = payload;
   await db.write();
-  return db[name];
+  return data[name];
 };
 
 const _delete = async (name) => {
-  delete db[name];
+  delete data[name];
   await db.write();
 };
 
@@ -22,12 +24,7 @@ const _put = (name, payload) => {
 };
 
 const _get = (name) => {
-  return db[name];
+  return data[name];
 };
 
-export default {
-  _delete,
-  _get,
-  _post,
-  _put,
-};
+export { _delete, _get, _post, _put };

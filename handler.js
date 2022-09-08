@@ -1,5 +1,5 @@
-import { _post, _put, _delete, _get } from "./dbAgent";
-import { stringify } from "./utils";
+import { _post, _put, _delete, _get } from "./dbAgent.js";
+import { stringify, parse } from "./utils.js";
 
 const handlerMap = {
   POST: _post,
@@ -9,14 +9,23 @@ const handlerMap = {
 };
 
 export const jsonCrud = async (event) => {
+  console.log({
+    event,
+  });
+
   try {
     const _method = event.httpMethod;
+    const _body = parse(event.body);
+    const _query = event.queryStringParameters;
+
     const _name =
-      _method === "GET" ? event.queryStringParameters.name : event.name;
+      _method === "GET"
+        ? _query.name // query string
+        : _body.name; // body
 
-    if (!_name) throw new Error("no db table name is provided");
+    if (!_name) throw new Error("no db name is provided");
 
-    const _data = event.data || {};
+    const _data = _body.data || {};
     const result = await handlerMap[_method](_name, _data);
 
     return {
@@ -27,7 +36,6 @@ export const jsonCrud = async (event) => {
       }),
     };
   } catch (error) {
-    console.error(error);
     return {
       statusCode: 500,
       body: stringify({
