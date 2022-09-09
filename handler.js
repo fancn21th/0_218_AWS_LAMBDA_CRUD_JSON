@@ -1,14 +1,19 @@
 import { _post, _put, _delete, _get } from "./dbAgent.js";
 import { stringify, parse } from "./utils.js";
 
+// HTTP API has different way to identify the http methods
+
 const handlerMap = {
-  POST: _post,
-  GET: _get,
-  DELETE: _delete,
-  PUT: _put,
+  "GET /db/{name}": _get,
+  "DELETE /db/{name}": _delete,
+  "POST /db/{name}": _post,
+  "PUT /db/{name}": _put,
 };
 
-const noBodyMethods = ["GET", "DELETE"];
+const noBodyRequiredMethods = ["GET /db/{name}", "DELETE /db/{name}"];
+
+const dataFieldInBody = "data";
+const forceDeleteFieldInBody = "iamsureofdoingthis";
 
 export const jsonCrud = async (event) => {
   // console.log({
@@ -16,28 +21,38 @@ export const jsonCrud = async (event) => {
   // });
 
   try {
-    const _method = event.httpMethod;
+    const _method = event.routeKey; // routeKey in place of httpMethod
     const _body = parse(event.body); // body
-    const _query = event.queryStringParameters; // query string
+    const { name: _name, id: _id } = event.pathParameters; // pathParameters in place of queryStringParameters
 
-    // derived properties
-    const _name = noBodyMethods.includes(_method) ? _query.name : _body.name;
-    const _data = noBodyMethods.includes(_method) ? null : _body.data;
+    // derived
+    const _isBodyRequired = !noBodyRequiredMethods.includes(_method);
+    const _force = _body[forceDeleteFieldInBody];
+
+    let _data = null;
+
+    if (_isBodyRequired) {
+      _data = _body[dataFieldInBody];
+      _data = Array.isArray(_data) ? _data : [_data];
+    }
 
     // console.log({
     //   _name,
     //   _data,
     // });
 
-    if (!_name) throw new Error("no db name is provided");
+    if (!_name) throw new Error("no name is provided in /db/{name}");
 
-    const _value = await handlerMap[_method](_name, _data);
+    if (_isBodyRequired && !_data)
+      throw new Error("no data is provided in /db/{name} body");
+
+    const _value = await handlerMap[_method](_name, _data, _force);
 
     return {
       statusCode: 200,
       body: stringify({
         ok: true,
-        data: {
+        result: {
           [_name]: _value,
         },
       }),
@@ -48,7 +63,7 @@ export const jsonCrud = async (event) => {
       statusCode: 500,
       body: stringify({
         ok: false,
-        error: error && error.message,
+        error: error.message || "A Bad feeling I have about this...",
       }),
     };
   }
