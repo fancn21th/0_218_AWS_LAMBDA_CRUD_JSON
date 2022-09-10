@@ -13,7 +13,7 @@ const handlerMap = {
 const noBodyRequiredMethods = ["GET /db/{name}", "DELETE /db/{name}"];
 
 const dataFieldInBody = "data";
-const forceDeleteFieldInBody = "iamsureofdoingthis";
+const forceDeleteFieldInBody = process.env.FORCE_DELETE_FIELD;
 
 export const jsonCrud = async (event) => {
   // console.log({
