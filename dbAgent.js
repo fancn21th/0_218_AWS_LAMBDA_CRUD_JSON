@@ -8,16 +8,14 @@ await db.read();
 
 const data = db.data;
 
-const _post = async ({
-  itemType: name,
-  data: payload,
-  isForced: force,
-  itemId: id,
-}) => {
-  if (data.hasOwnProperty(name)) {
-    data[name] = [...data[name], payload];
+const _post = async ({ itemType: name, data: payload, itemId: id }) => {
+  if (!data.hasOwnProperty(name)) {
+    // no table of given name created before
+    data[name] = {
+      id: payload,
+    };
   } else {
-    data[name] = [payload];
+    data[name][id] = payload;
   }
   await db.write();
   return data[name];
@@ -42,17 +40,13 @@ const _put = async ({
     throw new Error(`no ${name} found in db`);
   }
 
-  const index = data[name].findIndex((item) => item.id === id);
+  const found = data[name][id];
 
-  if (index === -1) {
+  if (!found) {
     throw new Error(`no ${id} found in db ${name}`);
   }
 
-  data[name] = [
-    ...data[name].slice(0, index),
-    payload,
-    ...data[name].slice(index + 1),
-  ];
+  data[name][id] = payload;
 
   await db.write();
   return data[name];

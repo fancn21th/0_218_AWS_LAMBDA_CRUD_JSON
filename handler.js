@@ -6,42 +6,51 @@ import { stringify, parse } from "./utils.js";
 const handlerMap = {
   "GET /db/{name}": _get,
   "DELETE /db/{name}": _delete,
-  "POST /db/{name}": _post,
+  "POST /db/{name}/{id}": _post,
   "PUT /db/{name}": _put,
 };
 
 const noBodyRequiredMethods = ["GET /db/{name}", "DELETE /db/{name}"];
 
-const dataFieldInBody = "data";
 const forceDeleteFieldInBody = process.env.FORCE_DELETE_FIELD;
 
 export const jsonCrud = async (event) => {
+  // console.log({
+  //   event,
+  // });
+
   try {
     const _method = event.routeKey; // routeKey in place of httpMethod
     const _body = parse(event.body); // body
     const { name: _name, id: _id } = event.pathParameters; // pathParameters in place of queryStringParameters
+    const qsParams = event.queryStringParameters || {
+      [forceDeleteFieldInBody]: false,
+    };
 
     // derived
     const _isBodyRequired = !noBodyRequiredMethods.includes(_method);
-    const _force = _body[forceDeleteFieldInBody];
-    const _data = _body[dataFieldInBody];
+    const _force = _isBodyRequired
+      ? _body[forceDeleteFieldInBody]
+      : qsParams[forceDeleteFieldInBody] === "true";
 
-    console.log({
-      _name,
-      _data,
-      _id,
-      _force,
-    });
+    // console.log({
+    //   _name,
+    //   _body,
+    //   _id,
+    //   _force,
+    //   forceDeleteFieldInBody,
+    //   qsParams,
+    // });
 
     if (!_name) throw new Error("no name is provided in /db/{name}");
 
-    if (_isBodyRequired && !_data)
-      throw new Error("no data is provided in /db/{name} body");
+    if (_isBodyRequired && !_body)
+      throw new Error("no body is provided in /db/{name} body");
 
     const _value = await handlerMap[_method]({
       itemType: _name,
       itemId: _id,
-      data: _data,
+      data: _body,
       isForced: _force,
     });
 
@@ -49,9 +58,7 @@ export const jsonCrud = async (event) => {
       statusCode: 200,
       body: stringify({
         ok: true,
-        result: {
-          [_name]: _value,
-        },
+        result: _value,
       }),
     };
   } catch (error) {
