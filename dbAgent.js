@@ -12,7 +12,7 @@ const _post = async ({ itemType: name, data: payload, itemId: id }) => {
   if (!data.hasOwnProperty(name)) {
     // no table of given name created before
     data[name] = {
-      id: payload,
+      [id]: payload,
     };
   } else {
     data[name][id] = payload;
