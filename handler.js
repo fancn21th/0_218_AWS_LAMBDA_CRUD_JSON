@@ -16,10 +16,6 @@ const dataFieldInBody = "data";
 const forceDeleteFieldInBody = process.env.FORCE_DELETE_FIELD;
 
 export const jsonCrud = async (event) => {
-  // console.log({
-  //   event,
-  // });
-
   try {
     const _method = event.routeKey; // routeKey in place of httpMethod
     const _body = parse(event.body); // body
@@ -28,25 +24,26 @@ export const jsonCrud = async (event) => {
     // derived
     const _isBodyRequired = !noBodyRequiredMethods.includes(_method);
     const _force = _body[forceDeleteFieldInBody];
+    const _data = _body[dataFieldInBody];
 
-    let _data = null;
-
-    if (_isBodyRequired) {
-      _data = _body[dataFieldInBody];
-      _data = Array.isArray(_data) ? _data : [_data];
-    }
-
-    // console.log({
-    //   _name,
-    //   _data,
-    // });
+    console.log({
+      _name,
+      _data,
+      _id,
+      _force,
+    });
 
     if (!_name) throw new Error("no name is provided in /db/{name}");
 
     if (_isBodyRequired && !_data)
       throw new Error("no data is provided in /db/{name} body");
 
-    const _value = await handlerMap[_method](_name, _data, _force);
+    const _value = await handlerMap[_method]({
+      itemType: _name,
+      itemId: _id,
+      data: _data,
+      isForced: _force,
+    });
 
     return {
       statusCode: 200,
