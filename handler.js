@@ -34,9 +34,7 @@ export const jsonCrud = async (event) => {
 
     // derived
     const _isBodyRequired = !noBodyRequiredMethods.includes(_method);
-    const _force = _isBodyRequired
-      ? _body[forceDeleteField]
-      : qsParams[forceDeleteField] === "true";
+    const _force = qsParams[forceDeleteField] === "true";
 
     console.log({
       _method,
