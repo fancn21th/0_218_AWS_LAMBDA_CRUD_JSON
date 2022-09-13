@@ -21,12 +21,22 @@ const _post = async ({ itemType: name, data: payload, itemId: id }) => {
   return data[name];
 };
 
-const _delete = async ({ itemType: name, isForced: force }) => {
-  if (!force)
+const _delete = async ({ itemType: name, itemId: id, isForced: force }) => {
+  if (!force) {
     throw new Error(
-      "you have not confirmed the deletion, please contact with admin."
+      "you have not authorized with deletion action, please contact with admin."
     );
-  delete data[name];
+  }
+  if (!data.hasOwnProperty(name)) {
+    throw new Error(`no ${name} found in db`);
+  }
+  if (!id) {
+    // delete a table
+    delete data[name];
+  } else {
+    // delete an item
+    delete data[name][id];
+  }
   await db.write();
 };
 

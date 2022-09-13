@@ -6,13 +6,18 @@ import { stringify, parse } from "./utils.js";
 const handlerMap = {
   "GET /db/{name}": _get,
   "DELETE /db/{name}": _delete,
+  "DELETE /db/{name}/{id}": _delete,
   "POST /db/{name}/{id}": _post,
   "PUT /db/{name}": _put,
 };
 
-const noBodyRequiredMethods = ["GET /db/{name}", "DELETE /db/{name}"];
+const noBodyRequiredMethods = [
+  "GET /db/{name}",
+  "DELETE /db/{name}",
+  "DELETE /db/{name}/{id} ",
+];
 
-const forceDeleteFieldInBody = process.env.FORCE_DELETE_FIELD;
+const forceDeleteField = process.env.FORCE_DELETE_FIELD;
 
 export const jsonCrud = async (event) => {
   // console.log({
@@ -24,30 +29,39 @@ export const jsonCrud = async (event) => {
     const _body = parse(event.body); // body
     const { name: _name, id: _id } = event.pathParameters; // pathParameters in place of queryStringParameters
     const qsParams = event.queryStringParameters || {
-      [forceDeleteFieldInBody]: false,
+      [forceDeleteField]: false,
     };
 
     // derived
     const _isBodyRequired = !noBodyRequiredMethods.includes(_method);
     const _force = _isBodyRequired
-      ? _body[forceDeleteFieldInBody]
-      : qsParams[forceDeleteFieldInBody] === "true";
+      ? _body[forceDeleteField]
+      : qsParams[forceDeleteField] === "true";
 
-    // console.log({
-    //   _name,
-    //   _body,
-    //   _id,
-    //   _force,
-    //   forceDeleteFieldInBody,
-    //   qsParams,
-    // });
+    console.log({
+      _method,
+      _name,
+      _body,
+      _id,
+      _force,
+      forceDeleteFieldInBody: forceDeleteField,
+      qsParams,
+    });
+
+    if (!forceDeleteField)
+      throw new Error("service env has no FORCE_DELETE_FIELD provided");
 
     if (!_name) throw new Error("no name is provided in /db/{name}");
 
     if (_isBodyRequired && !_body)
       throw new Error("no body is provided in /db/{name} body");
 
-    const _value = await handlerMap[_method]({
+    const handler = handlerMap[_method];
+
+    if (!handler) throw new Error(`the ${_method} is not supported yet.`);
+
+    // biz logic invocation
+    const _value = await handler({
       itemType: _name,
       itemId: _id,
       data: _body,

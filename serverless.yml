@@ -4,6 +4,7 @@ frameworkVersion: "3"
 
 custom:
   bucket: fake-api-aug
+  force: undefined
 
 provider:
   name: aws
@@ -25,3 +26,4 @@ functions:
     handler: handler.jsonCrud
     environment:
       BUCKET: ${self:custom.bucket}
+      FORCE_DELETE_FIELD: ${self:custom.force}
